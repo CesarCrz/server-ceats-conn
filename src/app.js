@@ -314,9 +314,16 @@ const orderFlow = addKeyword(EVENTS.ORDER)
     const numero = ctx.from
     console.log(`ctx: ${JSON.stringify(ctx, null, 2)}`)
     console.log(`orderId: ${orderId}, orderToken: ${orderToken}`)
-    const orderDetails = await provider.vendor.getOrderDetails(orderId, orderToken)
-    console.log(`Detalles de la orden: ${JSON.stringify(orderDetails, null, 2 )}`)
-    const productDetails = getProducts(orderDetails);
+    //vamos a obtener cualquier posible error de provider
+    let orderDetails;
+    try {
+        orderDetails = await provider.vendor.getOrderDetails(orderId, orderToken);
+        console.log(`Detalles de la orden: ${JSON.stringify(orderDetails, null, 2)}`);
+    } catch (err) {
+        console.error("❌ Error en getOrderDetails:", err);
+        return flowDynamic("No pudimos obtener los detalles de tu pedido. Por favor intenta más tarde.");
+    }
+        const productDetails = getProducts(orderDetails);
     /*await flowDynamic(`Hola ${ctx.name}, tu orden ha sido recibida y está siendo procesada.
                         \n🧾 ID: *${orderId}*
                         \n🍣 Detalle: ${productDetails.clientFormat}
